@@ -1,6 +1,7 @@
 // @ts-nocheck
 // import formidable from 'formidable-serverless';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Readable } from 'stream';
 
 export const config = {
   api: {
@@ -11,16 +12,16 @@ export const config = {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  req.rawBody = '';
-  req.setEncoding('utf8');
+  const readable = Readable.from(req);
+  const body: string[] = [];
 
-  req.on('data', function (chunk) {
-    req.rawBody += chunk;
+  readable.on('data', (chunk) => {
+    console.log(chunk);
+    body.push(chunk);
   });
 
-  req.on('end', function () {
-    console.log(req.rawBody.length);
-    return res.status(201).send(req.rawBody.length);
+  readable.on('end', () => {
+    console.log(body);
   });
 
   // form.onPart = (part) => {
