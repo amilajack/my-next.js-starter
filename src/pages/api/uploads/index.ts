@@ -11,20 +11,15 @@ export const config = {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   const form = new formidable.IncomingForm();
+  const filesEntries = [];
 
-  // await new Promise((resolve, reject) => {
-  //   form.parse(req, (err, fields, files) => {
-  //     console.log(err, fields, files);
-  //     if (err) reject(err);
-  //     else resolve(files);
-  //   });
-  // });
-
+  form.onPart = (part) => {
+    part.on('data', (buffer) => {
+      filesEntries.push([part.name!, buffer]);
+    });
+  };
   form.parse(req, async function (err, fields, files) {
-    // await saveFile(files.file);
-    console.log(files);
+    console.log(files, fields, filesEntries);
     return res.status(201).send('');
   });
-
-  // return res.json({ message: 'Hello World' });
 };
